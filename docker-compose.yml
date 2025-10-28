@@ -1,0 +1,8 @@
+services:
+  scraper:
+    build: .
+    container_name: projeto-scraping
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
