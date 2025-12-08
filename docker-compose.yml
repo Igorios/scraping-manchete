@@ -1,8 +1,11 @@
 services:
-  scraper:
+  api:
     build: .
-    container_name: projeto-scraping
+    container_name: scraping-web
+    restart: always
     volumes:
       - .:/app
     environment:
       - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
