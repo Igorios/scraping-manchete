@@ -17,3 +17,5 @@ tzdata==2025.2
 urllib3==2.5.0
 fastapi==0.120.4
 uvicorn==0.38.0
+pydantic==2.12.3
+pydantic_core==2.41.4
