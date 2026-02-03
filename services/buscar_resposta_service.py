@@ -46,7 +46,10 @@ class BuscarRespostaService:
 
         for m in manchetes:
             titulo = m.get_text(strip=True)
-            link = m.get("href") or ""
+            link = m.get("href")
+
+            if not link:
+                continue
 
             dados.append({
                 "titulo": titulo,
