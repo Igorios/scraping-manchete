@@ -5,9 +5,16 @@ from routers import busca_reposta_router
 
 app = FastAPI()
 
+enderecos = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://fast-news.igorborgesweb.com",
+    "https://console.cron-job.org"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=enderecos,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
