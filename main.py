@@ -8,6 +8,7 @@ app = FastAPI()
 enderecos = [
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:3001",
     "https://fast-news.igorborgesweb.com",
     "https://console.cron-job.org"
 ]
