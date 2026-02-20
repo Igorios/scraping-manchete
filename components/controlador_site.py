@@ -6,6 +6,8 @@ def controlador_site(request: BuscarRespostaRequest):
     match request.name:
         case "g1":
             return buscar_g1(request.urlSite)
+        case "Jornal Correio":
+            return buscar_jornal_correio(request.urlSite)
         case _:
             return []
 
