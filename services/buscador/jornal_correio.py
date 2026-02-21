@@ -2,25 +2,30 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter, Retry
 
+def _criar_sessao():
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=5,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
 def buscar_jornal_correio(urlSite: str):
     response = requests.get(urlSite)
+    response_rota_brasil = requests.get(urlSite + "/brasil")
+
     dados = []
 
     if response.status_code != 200:
         print("Erro ao acessar site!")
         raise Exception("Erro ao acessar site!")
 
-    session = requests.Session()
-
-    retry_strategy = Retry(
-        total=5,
-        backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504]
-    )
-
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+    session = _criar_sessao()
 
     headers = {
         "User-Agent": (
@@ -39,18 +44,23 @@ def buscar_jornal_correio(urlSite: str):
     except Exception as e:
         raise Exception(f"Erro ao acessar site: {e}")
 
+    # pagina inicial
     soup = BeautifulSoup(response.text, "html.parser")
+    soup_rota_brasil = BeautifulSoup(response_rota_brasil.text, "html.parser")
+
     div_wrapper = soup.find("div", class_="s4n-wrapper")
+    div_rota_brasil = soup_rota_brasil.find("div", class_="lista--container")
 
+    # pagina inicial
     if div_wrapper:
-
         links = div_wrapper.find_all("a")
 
         for m in links:
-
             h3_tag = m.find("h3")
-            titulo = h3_tag.get_text(strip=True)
+            if not h3_tag:
+                continue
 
+            titulo = h3_tag.get_text(strip=True)
             link = m.get("href")
 
             if not link:
@@ -61,5 +71,24 @@ def buscar_jornal_correio(urlSite: str):
                 "link": link
             })
 
-        return dados
-    return None
+    # pagina /brasil
+    if div_rota_brasil:
+        links = div_rota_brasil.find_all("a")
+
+        for m in links:
+            h2_tag = m.find("h2")
+            if not h2_tag:
+                continue
+
+            titulo = h2_tag.get_text(strip=True)
+            link = m.get("href")
+
+            if not link:
+                continue
+
+            dados.append({
+                "titulo": titulo,
+                "link": link
+            })
+
+    return dados
