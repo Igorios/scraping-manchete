@@ -2,6 +2,18 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter, Retry
 
+def _criar_sessao():
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=5,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
 def buscar_g1(urlSite: str):
     response = requests.get(urlSite)
     dados = []
@@ -10,17 +22,7 @@ def buscar_g1(urlSite: str):
         print("Erro ao acessar site!")
         raise Exception("Erro ao acessar site!")
 
-    session = requests.Session()
-
-    retry_strategy = Retry(
-        total=5,
-        backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504]
-    )
-
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+    session = _criar_sessao()
 
     headers = {
         "User-Agent": (
