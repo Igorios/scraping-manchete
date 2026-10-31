@@ -1,7 +1,6 @@
-__pycache__
-*.pyc
 .env
-.git
-.gitignore
-node_modules
-dist
+.venv/
+venv/
+__pycache__/
+.git/
+arquivos/
