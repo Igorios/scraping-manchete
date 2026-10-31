@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from routers import busca_reposta_router
 from routers import endereco_disponivel
+from services.redis_service import obter_cliente_redis
 
 app = FastAPI()
 
@@ -26,6 +27,16 @@ app.add_middleware(
 @app.get("/ping")
 def ping():
     return "pong"
+
+
+@app.get("/redis/health")
+def redis_health():
+    try:
+        obter_cliente_redis().ping()
+    except Exception as erro:
+        raise HTTPException(status_code=503, detail="Redis indisponivel") from erro
+
+    return {"status": "ok", "redis": "conectado"}
 
 app.include_router(busca_reposta_router.router)
 app.include_router(endereco_disponivel.router)
